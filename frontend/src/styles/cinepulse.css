@@ -1,0 +1,252 @@
+:root {
+  --cp-page-bg: #0d1117;
+  --cp-card-bg: #161b22;
+  --cp-input-bg: #0d1117;
+  --cp-hover-bg: #21262d;
+  --cp-border: #30363d;
+  --cp-text-primary: #e6edf3;
+  --cp-text-secondary: #8b949e;
+  --cp-text-muted: #6e7681;
+  --cp-code: #79c0ff;
+  --cp-purple: #6366f1;
+  --cp-btn-primary: #6e40c9;
+  --cp-btn-primary-hover: #7d4fd4;
+  --cp-green: #3fb950;
+  --cp-blue: #79c0ff;
+  --cp-lstm-blue: #58a6ff;
+  --cp-amber: #d2a534;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.cp-shell {
+  min-height: 100vh;
+  background: var(--cp-page-bg);
+  color: var(--cp-text-primary);
+}
+
+.cp-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 220px;
+  border-right: 1px solid var(--cp-border);
+  background: #0f141c;
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 20;
+}
+
+.cp-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.cp-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #49515a;
+  background: #1e2633;
+  color: var(--cp-code);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cp-brand h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cp-brand p {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--cp-text-muted);
+}
+
+.cp-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cp-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--cp-text-secondary);
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-left: 2px solid transparent;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 13px;
+}
+
+.cp-nav-link:hover {
+  background: #151c26;
+  color: var(--cp-text-primary);
+}
+
+.cp-nav-link-active {
+  border-left-color: var(--cp-purple);
+  background: #1b2330;
+  color: var(--cp-text-primary);
+}
+
+.cp-nav-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+}
+
+.cp-nav-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+}
+
+.cp-sidebar-footnote {
+  margin: 0;
+  font-size: 11px;
+  color: var(--cp-text-muted);
+}
+
+.cp-main {
+  margin-left: 220px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  max-height: 100vh;
+}
+
+.cp-topbar {
+  height: 64px;
+  border-bottom: 1px solid var(--cp-border);
+  background: #0d1117dd;
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.cp-topbar h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.cp-user-pill {
+  border: 1px solid var(--cp-border);
+  background: #111926;
+  border-radius: 999px;
+  color: var(--cp-code);
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.cp-content-scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+}
+
+.cp-page-card {
+  background: var(--cp-card-bg);
+  border: 1px solid var(--cp-border);
+  border-radius: 10px;
+}
+
+.cp-input,
+.cp-select,
+.cp-button-secondary,
+.cp-button-primary {
+  border-radius: 8px;
+  border: 1px solid var(--cp-border);
+  padding: 9px 12px;
+  font-size: 13px;
+}
+
+.cp-input,
+.cp-select {
+  background: var(--cp-input-bg);
+  color: var(--cp-text-primary);
+}
+
+.cp-input:focus,
+.cp-select:focus {
+  outline: none;
+  border-color: #4f5e6d;
+}
+
+.cp-button-primary {
+  background: var(--cp-btn-primary);
+  color: #fff;
+  cursor: pointer;
+}
+
+.cp-button-primary:hover {
+  background: var(--cp-btn-primary-hover);
+}
+
+.cp-button-secondary {
+  background: transparent;
+  color: var(--cp-text-primary);
+  cursor: pointer;
+}
+
+.cp-button-secondary:hover {
+  background: var(--cp-hover-bg);
+}
+
+.cp-muted {
+  color: var(--cp-text-muted);
+}
+
+.cp-pulse {
+  animation: cpPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes cpPulse {
+  0% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes cpStatusPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 960px) {
+  .cp-sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+
+  .cp-main {
+    margin-left: 0;
+    max-height: none;
+  }
+}

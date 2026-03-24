@@ -1,0 +1,59 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment / secrets
+.env
+.env.*
+*.env
+
+# Node / Vite
+node_modules/
+frontend/node_modules/
+frontend/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Backend local environment artifacts
+backend/venv/
+backend/.venv/
+
+# Build / logs / temp
+build/
+dist/
+coverage/
+*.log
+*.tmp
+*.temp
+
+# Project runtime artifacts
+Reinforcement_Learning_Recommender/data/feedback_store.json
+Reinforcement_Learning_Recommender/results/
+
+# Optional: uncomment if you do not want to version large trained model artifacts
+# GraphModel/movie_embeddings.txt
+# Sequential Deep Learning Model/models/
+# Reinforcement_Learning_Recommender/models/

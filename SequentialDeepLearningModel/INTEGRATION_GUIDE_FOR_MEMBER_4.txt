@@ -1,0 +1,187 @@
+================================================================================
+INTEGRATION_GUIDE_FOR_MEMBER_4.txt
+================================================================================
+TO:      Member 4 (Reinforcement Learning Recommender)
+FROM:    Member 3 (Sequential Deep Learning Module)
+SUBJECT: Handoff of Sequential Attention-LSTM Model & State Representation
+================================================================================
+
+
+1. MISSION OVERVIEW
+--------------------------------------------------------------------------------
+In our pipeline, my module (LSTM) handles Temporal Intent. It tracks what the
+user just watched to create a "State Representation." Your RL Agent will use
+this "State" to select the best action (recommendation).
+
+The Flow:
+  User History (10 movies)
+        |
+        v
+  My LSTM Model
+        |
+        v
+  128-dim User State Vector
+        |
+        v
+  Your RL Agent
+        |
+        v
+  Final Recommendation Selection
+
+
+2. THE PACKAGE CONTENTS
+--------------------------------------------------------------------------------
+I have provided the following files for your implementation:
+
+  1. models/lstm_model.pt
+     The trained weights of the Attention-LSTM.
+
+  2. src/model.py
+     The architecture definition (AttentionLSTM class).
+
+  3. data/movie2idx.json
+     CRITICAL. This is the shared dictionary. In our models, "Movie Index 5"
+     is the same movie. You MUST use this mapping for your RL environment.
+
+  4. src/extract_states.py
+     A utility script I wrote for you to easily extract the 128-dimensional
+     User State vector from any sequence.
+
+
+3. YOUR ROLE & RELATIONSHIP TO OTHER MEMBERS
+--------------------------------------------------------------------------------
+  - Relationship to Member 1 (Graph):
+    While Member 1 provides static node embeddings, my module provides the
+    dynamic session context.
+
+  - Relationship to Member 2 (Baseline):
+    Your RL agent should aim to outperform Member 2's Random Forest by using
+    the deep "State" my model provides.
+
+  - Your Task:
+    Build a Reinforcement Learning Agent (Multi-Armed Bandit or Deep Q-Network)
+    that takes my 128-dim vector as the State input and selects an Action
+    (a movie or genre) to maximize the Reward (user rating/engagement).
+
+
+4. HOW TO USE MY OUTPUT IN YOUR RL AGENT
+--------------------------------------------------------------------------------
+
+A. Defining the "State" (S)
+----------------------------
+In RL, the state S represents the environment. I have set my model to produce a
+128-dimensional context vector. This vector summarizes the user's 10-movie
+history.
+
+  - Input to your Agent: A vector of shape (1, 128).
+
+
+B. Using the State Extractor
+------------------------------
+I have provided extract_states.py to make your life easier. Here is how you
+can get the state for your RL training loop:
+
+    from extract_states import load_trained_model, get_user_state
+    import json
+
+    # 1. Load my model
+    model = load_trained_model("models/lstm_model.pt", vocab_size=9725)
+
+    # 2. Get a user's last 10 movies (as indices from movie2idx.json)
+    # Example sequence (padded to length 10)
+    user_seq = [0, 0, 0, 102, 45, 12, 505, 31, 99, 10]
+
+    # 3. Extract the RL 'State'
+    user_state_vector = get_user_state(model, user_seq, device="cpu")
+    # Result: A 128-dim torch tensor ready for your RL Agent
+
+
+C. Defining the "Reward" (R)
+------------------------------
+You should define your Reward function using the ratings.csv:
+
+  - If user rating >= 4  :  Reward = +2
+  - If user rating <  4  :  Reward = +1
+  - If user skips (no interaction) :  Reward = -1
+
+
+5. TECHNICAL CONSTRAINTS
+--------------------------------------------------------------------------------
+  - Sequence Length:
+    My model is trained on a sequence length of 10. If a user has only watched
+    3 movies, you must "pre-pad" the sequence with zeros:
+      [0, 0, 0, 0, 0, 0, 0, Movie1, Movie2, Movie3]
+
+  - Vocab Size:
+    9,725  (9,724 movies + 1 padding index)
+
+  - Indices:
+    Always ensure you are converting movieId (from CSV) to movie_idx
+    (from my JSON) before passing it to the model.
+
+
+6. PERFORMANCE TARGETS
+--------------------------------------------------------------------------------
+My model achieved:
+  - Hit Rate  (HR@10)  :  8.14%
+  - NDCG@10            :  0.0457
+
+Your goal for the project is to show that your Reinforcement Learning Agent,
+by using these states and learning from rewards, can eventually improve these
+engagement metrics or provide more diverse recommendations.
+
+
+7. CONTACT
+--------------------------------------------------------------------------------
+If you get a Shape Mismatch error or Index out of range, it means our mappings
+are not aligned. Let's sync immediately.
+
+
+================================================================================
+ADDENDUM — UPDATED SECTION 4-B: RECOMMENDED IMPLEMENTATION (v2)
+================================================================================
+The code block below is the updated and more explicit version of Section 4-B
+above. Use this version for your actual implementation as it exposes all
+hyperparameters explicitly and matches the real function signatures in
+extract_states.py.
+
+NOTE: The original Section 4-B above is kept for reference. This addendum
+does NOT replace it — it is an improved, production-ready version.
+
+--------------------------------------------------------------------------------
+
+    from extract_states import load_trained_model, get_user_state
+    import torch
+
+    # 1. Setup Parameters
+    VOCAB_SIZE = 9725
+    EMBED_DIM  = 64
+    HIDDEN_DIM = 128
+    device     = torch.device('cpu')
+
+    # 2. Load the model using Member 3's real loader
+    model = load_trained_model(
+        "models/lstm_model.pt",
+        vocab_size     = VOCAB_SIZE,
+        embedding_dim  = EMBED_DIM,
+        hidden_dim     = HIDDEN_DIM,
+        output_dim     = VOCAB_SIZE,
+        device         = device
+    )
+
+    # 3. Extract the RL 'State' from a sequence
+    # (The sequence must be 10 indices long)
+    user_seq = [0, 0, 0, 102, 45, 12, 505, 31, 99, 10]
+    user_state_vector = get_user_state(model, user_seq, device)
+
+    print(user_state_vector.shape)  # Result: (128,)
+
+--------------------------------------------------------------------------------
+Key differences from the original 4-B:
+  - All model hyperparameters (EMBED_DIM, HIDDEN_DIM, output_dim) are passed
+    explicitly so there is no ambiguity about the model shape.
+  - device is passed as a torch.device object, not a plain string.
+  - output_dim is set to VOCAB_SIZE (9725), matching training configuration.
+================================================================================
+END OF DOCUMENT
+================================================================================

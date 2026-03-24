@@ -1,0 +1,24 @@
+Go to backend folder
+cd D:\Ishan-Peshkar-Personel\coding\Capstone\frontend-zip-file\Capstone_Final\backend
+
+Install uvicorn into this venv (once)
+.\venv\Scripts\python.exe -m pip install "uvicorn[standard]"
+
+Start backend (always works even if uvicorn command is not on PATH)
+.\venv\Scripts\python.exe -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+
+If you want all dependencies first, run:
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+
+Then run backend with:
+.\venv\Scripts\python.exe -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+
+
+
+
+
+For frontend, after install, the exact run command is:
+
+cd D:\Ishan-Peshkar-Personel\coding\Capstone\frontend-zip-file\Capstone_Final\Fronted
+npm install
+npm run dev
