@@ -107,8 +107,8 @@ flowchart TB
 
 %% ================= INPUT LAYER =================
 subgraph A[User Interaction Layer]
-        U1[User Activity<br/>Ratings | Clicks | Watch Time]
-        U2[Metadata<br/>Movies | Genres | Timestamps]
+        U1[User Activity<br/>Ratings &#124; Clicks &#124; Watch Time]
+        U2[Metadata<br/>Movies &#124; Genres &#124; Timestamps]
 end
 
 %% ================= DATA PIPELINE =================
@@ -187,7 +187,7 @@ RL3 --> S1 --> S2 --> S3
 
 %% ================= FEEDBACK LOOP =================
 subgraph G[Feedback Loop]
-        FB1[User Interaction<br/>Click | Watch | Skip]
+        FB1[User Interaction<br/>Click &#124; Watch &#124; Skip]
         FB2[Reward Signal<br/>+2 / +1 / -1]
 end
 
@@ -342,7 +342,7 @@ cd ../backend
 uvicorn app:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Backend runs at: `http://127.0.0.1:8000`  
+Backend runs at: `http://127.0.0.1:8000`
 API docs at: `http://127.0.0.1:8000/docs`
 
 ---
@@ -581,15 +581,15 @@ Verify these files exist:
 
 | Name | Register No | Module |
 |------|-------------|--------|
-| Vikesh Mehta | 22BCE11631 | M5 - Backend Integration and React Dashboard |
+| Harsh Kumar | 22BCE11405 | M5 - Backend Integration and React Dashboard |
 | Ayush Raj | 22BCE10636 | M1 - Graph Representation Learning (Node2Vec) |
 | Om Milind Kabade | 22BCE10890 | M2 - Feature Engineering and Random Forest Baseline |
-| Harsh Kumar | 22BCE11405 | M4 - Reinforcement Learning Agent (Thompson Sampling) |
+| Vikesh Mehta | 22BCE11631 | M4 - Reinforcement Learning Agent (Thompson Sampling) |
 | Ishan Peshkar | 22BCE10502 | M3 - Sequential Deep Learning (Attention-LSTM) |
 
-Supervisor: Mr. Chour Singh Rajpoot  
-Institution: VIT Bhopal University, Department of Computer Science and Engineering  
-Course: DSN4095 - Capstone Project Phase II  
+Supervisor: Mr. Chour Singh Rajpoot
+Institution: VIT Bhopal University, Department of Computer Science and Engineering
+Course: DSN4095 - Capstone Project Phase II
 Year: 2026
 
 ---
@@ -598,7 +598,7 @@ Year: 2026
 
 This project uses the [MovieLens ml-latest-small](https://grouplens.org/datasets/movielens/latest/) dataset.
 
-Citation:  
+Citation:
 F. Maxwell Harper and Joseph A. Konstan. 2015. *The MovieLens Datasets: History and Context*. ACM Transactions on Interactive Intelligent Systems, 5(4):19.
 
 If needed, download from [grouplens.org](https://grouplens.org/datasets/movielens/latest/) and place files in model-specific data folders.
