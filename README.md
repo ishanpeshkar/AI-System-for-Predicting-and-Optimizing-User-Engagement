@@ -99,7 +99,7 @@ Node2Vec   Baseline  Attention-LSTM
   },
   "flowchart": {
         "curve": "basis",
-        "htmlLabels": true
+        "htmlLabels": false
   }
 }}%%
 
@@ -107,16 +107,16 @@ flowchart TB
 
 %% ================= INPUT LAYER =================
 subgraph A[User Interaction Layer]
-        U1[User Activity<br/>Ratings &#124; Clicks &#124; Watch Time]
-        U2[Metadata<br/>Movies &#124; Genres &#124; Timestamps]
+        U1[User Activity\nRatings | Clicks | Watch Time]
+        U2[Metadata\nMovies | Genres | Timestamps]
 end
 
 %% ================= DATA PIPELINE =================
 subgraph B[Data Processing and Feature Engineering]
-        P1[Data Cleaning<br/>Noise Removal]
-        P2[Feature Engineering<br/>User + Movie Features]
-        P3[Sequence Builder<br/>Sliding Window L=10]
-        P4[Graph Constructor<br/>User-Movie Network]
+        P1[Data Cleaning\nNoise Removal]
+        P2[Feature Engineering\nUser + Movie Features]
+        P3[Sequence Builder\nSliding Window L=10]
+        P4[Graph Constructor\nUser-Movie Network]
 end
 
 U1 --> P1
@@ -130,14 +130,14 @@ subgraph C[Multi-Model Intelligence Layer]
 
         %% Graph Model
         subgraph C1[Graph Representation]
-                G1[Node2Vec<br/>Random Walks]
-                G2[Embedding Space<br/>64-dim Vectors]
+                G1[Node2Vec\nRandom Walks]
+                G2[Embedding Space\n64-dim Vectors]
         end
 
         %% Baseline Model
         subgraph C2[Statistical Learning]
                 RF1[Random Forest]
-                RF2[Engagement Probability<br/>(0-1)]
+                RF2[Engagement Probability\n0-1]
         end
 
         %% Sequential Model
@@ -145,7 +145,7 @@ subgraph C[Multi-Model Intelligence Layer]
                 L1[Embedding Layer]
                 L2[LSTM Layers]
                 L3[Attention Mechanism]
-                L4[User State Vector<br/>128-dim]
+                L4[User State Vector\n128-dim]
         end
 
 end
@@ -158,7 +158,7 @@ P3 --> L1 --> L2 --> L3 --> L4
 %% ================= FUSION LAYER =================
 subgraph D[Signal Fusion Layer]
         F1[Candidate Recommendation Pool]
-        F2[Multi-Signal Aggregation<br/>Graph + RF + LSTM]
+        F2[Multi-Signal Aggregation\nGraph + RF + LSTM]
 end
 
 G2 --> F1
@@ -168,9 +168,9 @@ F1 --> F2
 
 %% ================= DECISION LAYER =================
 subgraph E[Reinforcement Learning Decision Engine]
-        RL1[State Input<br/>User Vector]
+        RL1[State Input\nUser Vector]
         RL2[Thompson Sampling Bandit]
-        RL3[Action Selection<br/>Explore vs Exploit]
+        RL3[Action Selection\nExplore vs Exploit]
 end
 
 F2 --> RL1
@@ -187,8 +187,8 @@ RL3 --> S1 --> S2 --> S3
 
 %% ================= FEEDBACK LOOP =================
 subgraph G[Feedback Loop]
-        FB1[User Interaction<br/>Click &#124; Watch &#124; Skip]
-        FB2[Reward Signal<br/>+2 / +1 / -1]
+        FB1[User Interaction\nClick | Watch | Skip]
+        FB2[Reward Signal\n+2 / +1 / -1]
 end
 
 S3 --> FB1 --> FB2 --> RL2
