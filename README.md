@@ -91,32 +91,27 @@ Node2Vec   Baseline  Attention-LSTM
 %%{init: {
   "theme": "base",
   "themeVariables": {
-        "fontFamily": "Segoe UI, Inter, Arial, sans-serif",
-        "primaryTextColor": "#0f172a",
-        "lineColor": "#334155",
-        "tertiaryColor": "#ffffff",
-        "background": "#ffffff"
-  },
-  "flowchart": {
-        "curve": "basis",
-        "htmlLabels": false
+    "fontFamily": "Segoe UI, Inter, Arial",
+    "primaryTextColor": "#0f172a",
+    "lineColor": "#334155",
+    "background": "#ffffff"
   }
 }}%%
 
 flowchart TB
 
-%% ================= INPUT LAYER =================
+%% INPUT LAYER
 subgraph A[User Interaction Layer]
-        U1[User Activity\nRatings | Clicks | Watch Time]
-        U2[Metadata\nMovies | Genres | Timestamps]
+    U1[User Activity<br/>Ratings, Clicks, Watch Time]
+    U2[Metadata<br/>Movies, Genres, Timestamps]
 end
 
-%% ================= DATA PIPELINE =================
+%% DATA PIPELINE
 subgraph B[Data Processing and Feature Engineering]
-        P1[Data Cleaning\nNoise Removal]
-        P2[Feature Engineering\nUser + Movie Features]
-        P3[Sequence Builder\nSliding Window L=10]
-        P4[Graph Constructor\nUser-Movie Network]
+    P1[Data Cleaning<br/>Noise Removal]
+    P2[Feature Engineering<br/>User and Movie Features]
+    P3[Sequence Builder<br/>Sliding Window L=10]
+    P4[Graph Constructor<br/>User-Movie Network]
 end
 
 U1 --> P1
@@ -125,40 +120,36 @@ P1 --> P2
 P2 --> P3
 P2 --> P4
 
-%% ================= MODEL LAYER =================
+%% MODEL LAYER
 subgraph C[Multi-Model Intelligence Layer]
 
-        %% Graph Model
-        subgraph C1[Graph Representation]
-                G1[Node2Vec\nRandom Walks]
-                G2[Embedding Space\n64-dim Vectors]
-        end
+    subgraph C1[Graph Representation]
+        G1[Node2Vec<br/>Random Walks]
+        G2[Embedding Space<br/>64-dim Vectors]
+    end
 
-        %% Baseline Model
-        subgraph C2[Statistical Learning]
-                RF1[Random Forest]
-                RF2[Engagement Probability\n0-1]
-        end
+    subgraph C2[Statistical Learning]
+        RF1[Random Forest]
+        RF2[Engagement Probability<br/>0 to 1]
+    end
 
-        %% Sequential Model
-        subgraph C3[Temporal Modeling]
-                L1[Embedding Layer]
-                L2[LSTM Layers]
-                L3[Attention Mechanism]
-                L4[User State Vector\n128-dim]
-        end
+    subgraph C3[Temporal Modeling]
+        L1[Embedding Layer]
+        L2[LSTM Layers]
+        L3[Attention Mechanism]
+        L4[User State Vector<br/>128-dim]
+    end
 
 end
 
-%% Connections inside model layer
 P4 --> G1 --> G2
 P2 --> RF1 --> RF2
 P3 --> L1 --> L2 --> L3 --> L4
 
-%% ================= FUSION LAYER =================
+%% FUSION
 subgraph D[Signal Fusion Layer]
-        F1[Candidate Recommendation Pool]
-        F2[Multi-Signal Aggregation\nGraph + RF + LSTM]
+    F1[Candidate Recommendation Pool]
+    F2[Multi-Signal Aggregation<br/>Graph + RF + LSTM]
 end
 
 G2 --> F1
@@ -166,52 +157,32 @@ RF2 --> F1
 L4 --> F1
 F1 --> F2
 
-%% ================= DECISION LAYER =================
-subgraph E[Reinforcement Learning Decision Engine]
-        RL1[State Input\nUser Vector]
-        RL2[Thompson Sampling Bandit]
-        RL3[Action Selection\nExplore vs Exploit]
+%% RL DECISION
+subgraph E[Reinforcement Learning Engine]
+    RL1[State Input<br/>User Vector]
+    RL2[Thompson Sampling Bandit]
+    RL3[Action Selection<br/>Explore vs Exploit]
 end
 
 F2 --> RL1
 RL1 --> RL2 --> RL3
 
-%% ================= OUTPUT =================
+%% OUTPUT
 subgraph F[Serving Layer]
-        S1[Final Recommendation List]
-        S2[FastAPI Backend]
-        S3[React Dashboard UI]
+    S1[Final Recommendation List]
+    S2[FastAPI Backend]
+    S3[React Dashboard UI]
 end
 
 RL3 --> S1 --> S2 --> S3
 
-%% ================= FEEDBACK LOOP =================
+%% FEEDBACK
 subgraph G[Feedback Loop]
-        FB1[User Interaction\nClick | Watch | Skip]
-        FB2[Reward Signal\n+2 / +1 / -1]
+    FB1[User Interaction<br/>Click, Watch, Skip]
+    FB2[Reward Signal<br/>+2, +1, -1]
 end
 
 S3 --> FB1 --> FB2 --> RL2
-
-%% ================= SUBGRAPH STYLING =================
-style A fill:#ecfeff,stroke:#0f766e,stroke-width:1.5px,color:#0f172a
-style B fill:#eff6ff,stroke:#1d4ed8,stroke-width:1.5px,color:#0f172a
-style C fill:#f5f3ff,stroke:#6d28d9,stroke-width:1.5px,color:#0f172a
-style D fill:#fff7ed,stroke:#c2410c,stroke-width:1.5px,color:#0f172a
-style E fill:#fff1f2,stroke:#be123c,stroke-width:1.5px,color:#0f172a
-style F fill:#ecfdf5,stroke:#15803d,stroke-width:1.5px,color:#0f172a
-style G fill:#fefce8,stroke:#a16207,stroke-width:1.5px,color:#0f172a
-
-%% ================= NODE CLASSES =================
-classDef process fill:#ffffff,stroke:#475569,stroke-width:1.2px,color:#0f172a,rx:8,ry:8;
-classDef model fill:#faf5ff,stroke:#7c3aed,stroke-width:1.2px,color:#111827,rx:8,ry:8;
-classDef decision fill:#fff1f2,stroke:#e11d48,stroke-width:1.4px,color:#111827,rx:8,ry:8;
-classDef serving fill:#ecfdf5,stroke:#16a34a,stroke-width:1.2px,color:#111827,rx:8,ry:8;
-
-class P1,P2,P3,P4,F1,F2 process;
-class G1,G2,RF1,RF2,L1,L2,L3,L4 model;
-class RL1,RL2,RL3 decision;
-class S1,S2,S3,FB1,FB2 serving;
 ```
 
 ---
