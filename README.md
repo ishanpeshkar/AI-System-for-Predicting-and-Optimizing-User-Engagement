@@ -1,456 +1,626 @@
-# CinePulse — AI-Powered Movie Recommendation System
+# CinePulse 🎬
 
-**A complete human engagement and interaction system for movie recommendations using 4 AI models**
+> **An AI system for predicting and optimizing user engagement through multi-model signal fusion**
 
-This project combines four distinct machine learning approaches (Graph Embeddings, Random Forest Baseline, Sequential LSTM, and Reinforcement Learning) into a single, transparent recommendation interface. The system explains *why* each recommendation is made, providing users with complete visibility into AI decision-making.
+[![Python](https://img.shields.io/badge/Python-3.9+-blue?style=flat-square&logo=python)](https://python.org)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red?style=flat-square&logo=pytorch)](https://pytorch.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-19+-61DAFB?style=flat-square&logo=react)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-8+-646CFF?style=flat-square&logo=vite)](https://vitejs.dev)
+
+CinePulse is a research-grade recommendation system built as a final-year Capstone Project at VIT Bhopal University. It runs four different AI models on the same user simultaneously (Graph, Random Forest, Sequential LSTM, and Reinforcement Learning) and keeps the decision process transparent through model-wise outputs and reasoning.
 
 ---
 
-## 🎬 **Quick Start**
+## What makes this different
 
-### **Prerequisites**
-- Node.js 18+ (for frontend)
-- Python 3.9+ (for backend)
-- npm or yarn (for frontend package management)
+Most recommendation systems ask: *"What does this user like?"*
 
-### **Setup — Frontend Only (5 minutes)**
+CinePulse asks four different questions at once:
 
-```bash
-# 1. Navigate to frontend directory
-cd Capstone_Final/Fronted
+| Model | Question asked |
+|-------|----------------|
+| **M1 - Node2Vec Graph** | Who does this user resemble structurally in the interaction graph? |
+| **M2 - Random Forest** | What is the probability this user engages, based on tabular features? |
+| **M3 - Attention-LSTM** | Given the order of this user's last 10 movies, what comes next? |
+| **M4 - RL Bandit** | Which strategy maximizes long-term engagement from feedback? |
 
-# 2. Install dependencies
-npm install
+The RL agent adapts based on live user feedback events (liked/watched/disliked), improving strategy without retraining the full pipeline.
 
-# 3. Start development server
-npm run dev
+---
 
-# Frontend will open at http://localhost:5173
+## Live Demo Flow
+
+```text
+Select a userId (1-610)
+        |
+All 4 models run from the same backend API
+        |
+User Intelligence panel summarizes behavior
+        |
+2x2 model grid shows each model's top predictions
+        |
+Final recommendation banner surfaces optimized choice
+        |
+"Why this recommendation?" explains model consensus
+        |
+User submits feedback (Liked / Watched / Disliked)
+        |
+Bandit agent updates reward history immediately
 ```
 
-### **Setup — Full Stack (10 minutes)**
+---
+
+## Results
+
+| Metric | Value | Context |
+|--------|-------|---------|
+| **HR@10** | **8.14%** | About 80x above random baseline (~0.1%) |
+| **NDCG@10** | **0.0457** | Position-weighted ranking quality |
+| **Pipeline AUC** | **0.84** | vs 0.74 for baseline alone (+10 pts) |
+| **Regret reduction** | **61%** | RL agent over 5,000 episodes |
+
+---
+
+## Architecture
+
+```text
+MovieLens Dataset (ratings.csv, movies.csv, tags.csv)
+              |
+    +---------+----------+
+    |         |          |
+    v         v          v
+M1 Graph   M2 RF     M3 LSTM
+Node2Vec   Baseline  Attention-LSTM
+64-dim     prob 0-1  128-dim state
+    +---------+----------+
+              |
+              v
+         M4 RL Bandit
+      Thompson Sampling
+              |
+              v
+    FastAPI + React Dashboard
+      Explainable recommendations
+      + live feedback tracking
+```
+
+## System Architecture Diagram
+
+```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+        "fontFamily": "Segoe UI, Inter, Arial, sans-serif",
+        "primaryTextColor": "#0f172a",
+        "lineColor": "#334155",
+        "tertiaryColor": "#ffffff",
+        "background": "#ffffff"
+  },
+  "flowchart": {
+        "curve": "basis",
+        "htmlLabels": true
+  }
+}}%%
+
+flowchart TB
+
+%% ================= INPUT LAYER =================
+subgraph A[User Interaction Layer]
+        U1[User Activity<br/>Ratings | Clicks | Watch Time]
+        U2[Metadata<br/>Movies | Genres | Timestamps]
+end
+
+%% ================= DATA PIPELINE =================
+subgraph B[Data Processing and Feature Engineering]
+        P1[Data Cleaning<br/>Noise Removal]
+        P2[Feature Engineering<br/>User + Movie Features]
+        P3[Sequence Builder<br/>Sliding Window L=10]
+        P4[Graph Constructor<br/>User-Movie Network]
+end
+
+U1 --> P1
+U2 --> P1
+P1 --> P2
+P2 --> P3
+P2 --> P4
+
+%% ================= MODEL LAYER =================
+subgraph C[Multi-Model Intelligence Layer]
+
+        %% Graph Model
+        subgraph C1[Graph Representation]
+                G1[Node2Vec<br/>Random Walks]
+                G2[Embedding Space<br/>64-dim Vectors]
+        end
+
+        %% Baseline Model
+        subgraph C2[Statistical Learning]
+                RF1[Random Forest]
+                RF2[Engagement Probability<br/>(0-1)]
+        end
+
+        %% Sequential Model
+        subgraph C3[Temporal Modeling]
+                L1[Embedding Layer]
+                L2[LSTM Layers]
+                L3[Attention Mechanism]
+                L4[User State Vector<br/>128-dim]
+        end
+
+end
+
+%% Connections inside model layer
+P4 --> G1 --> G2
+P2 --> RF1 --> RF2
+P3 --> L1 --> L2 --> L3 --> L4
+
+%% ================= FUSION LAYER =================
+subgraph D[Signal Fusion Layer]
+        F1[Candidate Recommendation Pool]
+        F2[Multi-Signal Aggregation<br/>Graph + RF + LSTM]
+end
+
+G2 --> F1
+RF2 --> F1
+L4 --> F1
+F1 --> F2
+
+%% ================= DECISION LAYER =================
+subgraph E[Reinforcement Learning Decision Engine]
+        RL1[State Input<br/>User Vector]
+        RL2[Thompson Sampling Bandit]
+        RL3[Action Selection<br/>Explore vs Exploit]
+end
+
+F2 --> RL1
+RL1 --> RL2 --> RL3
+
+%% ================= OUTPUT =================
+subgraph F[Serving Layer]
+        S1[Final Recommendation List]
+        S2[FastAPI Backend]
+        S3[React Dashboard UI]
+end
+
+RL3 --> S1 --> S2 --> S3
+
+%% ================= FEEDBACK LOOP =================
+subgraph G[Feedback Loop]
+        FB1[User Interaction<br/>Click | Watch | Skip]
+        FB2[Reward Signal<br/>+2 / +1 / -1]
+end
+
+S3 --> FB1 --> FB2 --> RL2
+
+%% ================= SUBGRAPH STYLING =================
+style A fill:#ecfeff,stroke:#0f766e,stroke-width:1.5px,color:#0f172a
+style B fill:#eff6ff,stroke:#1d4ed8,stroke-width:1.5px,color:#0f172a
+style C fill:#f5f3ff,stroke:#6d28d9,stroke-width:1.5px,color:#0f172a
+style D fill:#fff7ed,stroke:#c2410c,stroke-width:1.5px,color:#0f172a
+style E fill:#fff1f2,stroke:#be123c,stroke-width:1.5px,color:#0f172a
+style F fill:#ecfdf5,stroke:#15803d,stroke-width:1.5px,color:#0f172a
+style G fill:#fefce8,stroke:#a16207,stroke-width:1.5px,color:#0f172a
+
+%% ================= NODE CLASSES =================
+classDef process fill:#ffffff,stroke:#475569,stroke-width:1.2px,color:#0f172a,rx:8,ry:8;
+classDef model fill:#faf5ff,stroke:#7c3aed,stroke-width:1.2px,color:#111827,rx:8,ry:8;
+classDef decision fill:#fff1f2,stroke:#e11d48,stroke-width:1.4px,color:#111827,rx:8,ry:8;
+classDef serving fill:#ecfdf5,stroke:#16a34a,stroke-width:1.2px,color:#111827,rx:8,ry:8;
+
+class P1,P2,P3,P4,F1,F2 process;
+class G1,G2,RF1,RF2,L1,L2,L3,L4 model;
+class RL1,RL2,RL3 decision;
+class S1,S2,S3,FB1,FB2 serving;
+```
+
+---
+
+## Project Structure
+
+```text
+Capstone_Final/
+|
++-- backend/
+|   +-- app.py                             # FastAPI entry point + endpoints
+|   +-- config.py                          # backend settings
+|   +-- requirements.txt
+|   +-- README.md
+|   +-- .env.example
+|
++-- frontend/
+|   +-- src/
+|   |   +-- pages/
+|   |   |   +-- Landing.jsx
+|   |   |   +-- Dashboard.jsx              # Main 4-model comparison hub
+|   |   |   +-- Compare.jsx                # Side-by-side model comparison
+|   |   |   +-- Recommendations.jsx        # Predict page
+|   |   |   +-- Metrics.jsx                # Charts + model metrics
+|   |   |   +-- About.jsx
+|   |   +-- layouts/
+|   |   |   +-- AppLayout.jsx
+|   |   +-- context/
+|   |   |   +-- UserContext.jsx
+|   |   +-- lib/
+|   |       +-- recommendations.js         # API helpers
+|   +-- package.json
+|   +-- vite.config.js
+|
++-- Feature Engineering + Baseline Model/
+|   +-- train_model.py
+|   +-- predict_engagement.py
+|   +-- rf_model.pkl
+|   +-- ml-latest-small/
+|
++-- GraphModel/
+|   +-- GraphModel.ipynb
+|   +-- node2vec_model.pkl
+|   +-- movie_embeddings.txt
+|   +-- movies.csv
+|   +-- ratings.csv
+|
++-- SequentialDeepLearningModel/
+|   +-- src/
+|   |   +-- model.py
+|   |   +-- extract_states.py
+|   +-- models/
+|   |   +-- lstm_model.pt
+|   +-- data/
+|       +-- movie2idx.json
+|       +-- movies.csv
+|       +-- ratings.csv
+|
++-- Reinforcement_Learning_Recommender/
+|   +-- main.py
+|   +-- mab_recommender.py
+|   +-- prediction_eval.py
+|   +-- train_mab.py
+|   +-- models/
+|   |   +-- mab_agent_thompson.pkl
+|   +-- data/
+|       +-- feedback_store.json
+|       +-- movies.csv
+|       +-- ratings.csv
+|
++-- Dataset/
++-- Run.txt
++-- README.md
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
 
 ```bash
-# 1. Setup Python virtual environment (backend)
-cd ../backend
+Python 3.9+
+Node.js 18+
+pip
+npm
+```
+
+### 1. Clone repository
+
+```bash
+git clone <your-repo-url>
+cd Capstone_Final
+```
+
+### 2. Frontend only (quick start)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend runs at: `http://localhost:5173`
+
+### 3. Full stack setup
+
+```bash
+# From Capstone_Final/
+cd backend
 python -m venv venv
 
 # Windows
 venv\Scripts\activate
-# macOS/Linux
+
+# macOS / Linux
 source venv/bin/activate
 
-# 2. Install Python dependencies
 pip install -r requirements.txt
 
-# 3. In another terminal, setup frontend
-cd ../Fronted
+# New terminal
+cd ../frontend
 npm install
 npm run dev
 
-# 4. Start backend (from backend directory with venv activated)
+# Back in backend terminal
 cd ../backend
 uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+```
 
-# Backend available at http://127.0.0.1:8000
-# Frontend available at http://localhost:5173
+Backend runs at: `http://127.0.0.1:8000`  
+API docs at: `http://127.0.0.1:8000/docs`
+
+---
+
+## API Reference
+
+### Health Check
+
+```http
+GET /health
+```
+
+Response:
+
+```json
+{ "status": "ok" }
 ```
 
 ---
 
-## 📁 **Project Structure**
+### Core Recommendation Endpoint
 
-```
-Capstone_Final/
-├── Fronted/                                    # React frontend (Vite)
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── Landing.jsx                     # Hero landing page
-│   │   │   ├── Dashboard.jsx                   # 4-model comparison hub (main page)
-│   │   │   ├── Compare.jsx                     # Side-by-side model analysis
-│   │   │   ├── Metrics.jsx                     # Performance charts & tables
-│   │   │   ├── Recommendations.jsx             # Predict/detail page
-│   │   │   └── About.jsx                       # About CinePulse
-│   │   ├── layouts/
-│   │   │   └── AppLayout.jsx                   # Persistent sidebar + top bar
-│   │   ├── context/
-│   │   │   └── UserContext.jsx                 # User state + system status
-│   │   ├── lib/
-│   │   │   └── recommendations.js              # API helpers & data
-│   │   ├── styles/
-│   │   │   └── cinepulse.css                   # Dark theme styles
-│   │   ├── App.jsx                             # Route definitions
-│   │   └── main.jsx                            # Entry point + providers
-│   ├── package.json
-│   └── vite.config.js
-│
-├── backend/                                    # FastAPI server
-│   ├── app.py                                  # Main API routes
-│   ├── config.py                               # Configuration management
-│   ├── requirements.txt                        # Python dependencies
-│   ├── .env.example                            # Example environment file
-│   └── __init__.py
-│
-├── Feature Engineering + Baseline Model/       # Random Forest model
-│   ├── rf_model.pkl                            # Trained RF classifier
-│   ├── ml-latest-small/                        # MovieLens dataset
-│   └── train_model.py
-│
-├── GraphModel/                                 # Node2Vec graph embeddings
-│   ├── movie_embeddings.txt                    # 64-dim movie embeddings
-│   ├── GraphModel.ipynb                        # Graph training notebook
-│   └── movies.csv
-│
-├── Sequential Deep Learning Model/             # LSTM sequence model
-│   ├── models/
-│   │   └── lstm_model.pt                       # Trained LSTM weights
-│   ├── src/
-│   │   ├── model.py                            # AttentionLSTM architecture
-│   │   └── extract_states.py
-│   ├── data/
-│   │   ├── movie2idx.json                      # Movie ID → index mapping
-│   │   └── X.npy, y.npy                        # Training data
-│   └── INTEGRATION_GUIDE_FOR_MEMBER_4.txt
-│
-├── Reinforcement_Learning_Recommender/        # Multi-armed bandit RL
-│   ├── models/
-│   │   └── mab_agent_thompson.pkl              # Trained RL agent
-│   ├── main.py
-│   ├── mab_recommender.py
-│   ├── prediction_eval.py
-│   ├── train_mab.py
-│   └── requirements.txt
-│
-└── README.md                                   # This file
-```
-
----
-
-## 🚀 **Features**
-
-### **Frontend — Human Engagement Layer**
-
-- **Dashboard**: 2×2 grid showing all 4 models running on same user simultaneously
-- **User Intelligence Panel**: AI-generated insights into user behavior, genre preferences, engagement level
-- **Why This Recommendation?**: Transparent reasoning showing which models voted for each movie
-- **Pipeline Visualization**: Visual flow showing data → LSTM → Graph → RL → Recommendation
-- **Confidence Bars**: Each model shows confidence % for top result
-- **Predict/Detail Page**: Single algorithm deep-dive with watch history and score explanations
-- **Compare Page**: Side-by-side model outputs with agreement highlighting
-- **Metrics**: Performance charts (training loss, RL rewards) + accuracy tables
-- **System Status Indicator**: Real-time feedback (ready → running → active → error)
-
-### **Backend — 4 Recommendation Models**
-
-1. **M1 - Graph (Node2Vec)**: Structural similarity in movie embedding space
-2. **M2 - Baseline (RF)**: Engagement probability via Random Forest tabular features
-3. **M3 - Sequential (LSTM)**: Temporal watch intent from recent movie sequence
-4. **M4 - RL (Bandit)**: Thompson Sampling balancing exploration vs. exploitation
-
----
-
-## 🔧 **API Endpoints**
-
-### **Core Recommendation**
-```
+```http
 POST /api/recommendations
-Request: {
+```
+
+```json
+{
   "userId": 1,
-  "topK": 5,
-  "algorithm": "RL (Bandit)"  | "Baseline (RF)" | "Graph (Node2Vec)" | "Sequential (LSTM)"
+  "topK": 10,
+  "algorithm": "RL (Bandit)"
 }
-Response: {
+```
+
+`algorithm` accepts: `"RL (Bandit)"` · `"Baseline (RF)"` · `"Graph (Node2Vec)"` · `"Sequential (LSTM)"`
+
+Response:
+
+```json
+{
   "userId": 1,
   "algorithm": "RL (Bandit)",
   "recommendations": [
     {
       "rank": 1,
-      "movieId": 356,
-      "title": "Forrest Gump (1994)",
-      "genres": "Drama|Romance",
-      "score": 0.92
-    },
-    ...
+      "movieId": 527,
+      "title": "Schindler's List (1993)",
+      "genres": "Drama|War",
+      "score": 1.803
+    }
   ]
 }
 ```
 
-### **User Intelligence**
-```
+---
+
+### User Intelligence Endpoint
+
+```http
 GET /api/user-intelligence/{user_id}
-Response: {
+```
+
+Returns dominant genre, trend, engagement label, sequence insight, and confidence score.
+
+---
+
+### User Profile Endpoint
+
+```http
+GET /api/user-profile/{user_id}
+```
+
+Returns real watch history, total ratings, average rating, dominant genre, and top genres.
+
+---
+
+### Feedback Endpoint (Model Learning Signal)
+
+```http
+POST /api/feedback
+```
+
+```json
+{
   "userId": 1,
-  "dominantGenre": "Sci-Fi",
-  "recentTrend": "Space / Futuristic",
-  "engagementLevel": "High",
-  "sequenceInsight": "User is transitioning from Action → Sci-Fi. Recent 5 movies show strong space theme.",
-  "confidenceScore": 0.82
+  "movieId": 527,
+  "movieTitle": "Schindler's List (1993)",
+  "feedbackType": "liked"
 }
 ```
 
-### **Engagement Tracking**
+`feedbackType` accepts: `"liked"` · `"watched"` · `"disliked"`
+
+---
+
+### Feedback Stats
+
+```http
+GET /api/feedback/stats
 ```
+
+Returns feedback totals, positive rate, type distribution, and recent logs.
+
+---
+
+### Engagement Tracking Endpoint
+
+```http
 POST /api/engagement-track
-Request: {
-  "userId": 1,
-  "recommendationId": 356,
-  "movieTitle": "Forrest Gump (1994)",
-  "clicked": true,
-  "watched": false,
-  "rating": null,
-  "timestamp": "2026-03-22T10:30:00Z"
-}
-Response: {
-  "status": "tracked",
-  "message": "Engagement recorded for user 1"
-}
 ```
 
-### **Health Check**
-```
-GET /health
-Response: { "status": "ok" }
-```
+Tracks click/watch/rating style events from the frontend interaction layer.
 
 ---
 
-## 🎯 **UI Tour**
+## Dashboard Pages
 
-### **Landing Page**
-- Hero with updated copy: "Four AI models. One user. See how each one thinks."
-- 4 metric cards: HR@10, AUC, Regret, Embeddings
-- Feature highlights
-- Team credentials
-
-### **Dashboard (Main Hub)**
-- **Left sidebar**: User selector + "Run Demo" button + recent watch history
-- **User Intelligence Panel**: Personalized genre/trend/engagement analysis
-- **Pipeline Strip**: Visual flow of recommendation pipeline
-- **2×2 Model Grid**: 
-  - M1 Graph (blue), M2 RF (green), M3 LSTM (bright blue), M4 RL (amber)
-  - Each shows top 3 results + confidence bars
-- **Final Recommendation Banner**:
-  - Movie title (from M4 RL)
-  - M2 score, M3 rank, model agreement count
-  - **"Why this recommendation?"** section with 4 checkmarks explaining each model's vote
-- **System status** in top bar (pulsing amber while loading, green when done)
-
-### **Compare Page**
-- User ID + Compare button + topK selector
-- 4 columns (Graph | Baseline | LSTM | RL)
-- movies appearing in 2+ models highlighted with left border
-- **Model Behavior Insights** card explaining each algorithm's approach
-- **Model Agreement** summary showing consensus movies
-
-### **Metrics Page**
-- 4 stat cards (HR@10, NDCG, AUC, Regret)
-- LSTM training loss chart (15 epochs)
-- RL cumulative reward curve (5000 episodes)
-- Baseline vs. full pipeline comparison table
-
-### **Predict/Detail Page**
-- Single model deep-dive
-- Watch history section
-- Full results grid (2 columns, all topK results)
-- Score type labels under every score
-- API call inspector showing exact request/response
+| Route | Page | Description |
+|------|------|-------------|
+| `/` | Landing | Project overview, value proposition, metrics snapshot |
+| `/dashboard` | Dashboard | User intelligence + 4 model outputs + final recommendation |
+| `/compare` | Compare Models | Side-by-side model behavior and overlap |
+| `/predict` | Predict | Single-model view with score labels and details |
+| `/metrics` | Metrics | Training charts, evaluation metrics, and progress |
+| `/about` | About | Team and capstone context |
 
 ---
 
-## 📊 **Key Metrics & Configuration**
+## Model Details
 
-### **Model Performance**
-- **HR@10** (Hit Rate): 8.14% (M3 LSTM)
-- **AUC**: 0.84 (full pipeline) vs 0.74 (M2 baseline alone)
-- **Regret Reduction**: 61% (M4 RL Thompson Sampling)
-- **Embeddings**: 64-dimensional Node2Vec
+### M1 - Graph Representation Learning (Node2Vec)
 
-### **User Intelligence Scoring**
-| User ID | Dominant Genre | Engagement | Confidence |
-|---------|----------------|------------|-----------|
-| 1       | Sci-Fi         | High       | 82%       |
-| 5       | Classic Drama  | High       | 76%       |
-| Other   | Mixed          | Variable   | 71%       |
+Builds a user-movie interaction graph and uses Node2Vec embeddings to capture structural similarity patterns.
 
-### **Model Confidence Scores**
-- M1 Graph: 91%
-- M2 RF: 81%
-- M3 LSTM: 84%
-- M4 RL: 88%
+- Output artifact: `GraphModel/movie_embeddings.txt`
+- Embedding size: 64 dimensions
 
----
+### M2 - Baseline ML (Random Forest)
 
-## 🔐 **Environment Setup**
+Learns engagement probability from engineered tabular features (user stats + movie stats + genres/year signals).
 
-Create `.env` file in `/backend` directory:
+- Output artifact: `Feature Engineering + Baseline Model/rf_model.pkl`
+- Baseline AUC: 0.74
 
-```env
-# Backend Server
-BACKEND_HOST=127.0.0.1
-BACKEND_PORT=8000
-BACKEND_RELOAD=true
+### M3 - Sequential Deep Learning (Attention-LSTM)
 
-# CORS (for frontend)
-CORS_ORIGINS=["http://localhost:5173", "http://127.0.0.1:5173"]
+Models temporal behavior from each user's recent watch sequence (length 10) and predicts likely next items.
 
-# Logging
-LOG_LEVEL=INFO
+- Output artifact: `SequentialDeepLearningModel/models/lstm_model.pt`
+- Key representation: 128-dim hidden state
+- HR@10: 8.14%
 
-# Model Configuration
-USE_GPU=false
-MODEL_CACHE_SIZE=1000
-```
+### M4 - Reinforcement Learning Agent (Thompson Sampling)
+
+Optimizes long-term reward with exploration/exploitation tradeoff based on observed feedback.
+
+- Output artifact: `Reinforcement_Learning_Recommender/models/mab_agent_thompson.pkl`
+- Regret reduction: 61% over training episodes
 
 ---
 
-## 🧪 **Testing the System**
+## Key Design Decisions
 
-### **Quick Demo Workflow**
-1. Open http://localhost:5173
-2. On Landing page, click "Open Dashboard"
-3. Click "Run Demo — User 1" button
-4. Watch system status turn amber (loading) → green (ready)
-5. See all 4 models load with results
-6. Read "User behavior intelligence" panel explaining this user
-7. See "Why this recommendation?" section in final banner
-8. Click "Compare" in sidebar to see all 4 models side-by-side
-9. View model agreement highlights
+- **Model transparency first**: each model output is visible before the final RL-optimized choice.
+- **Unified algorithm API contract**: all model calls use the same `/api/recommendations` schema.
+- **Shared data vocabulary**: `movie2idx.json` ensures consistent indexing for sequential modeling and integration.
+- **Immediate feedback loop**: feedback and engagement endpoints allow online adaptation signals.
+- **Capstone-friendly modularity**: each model module lives in a separate folder for independent experimentation.
 
-### **Manual API Testing**
+---
+
+## Troubleshooting
+
+### Frontend will not start
+
 ```bash
-# Using curl
-curl -X POST http://127.0.0.1:8000/api/recommendations \
-  -H "Content-Type: application/json" \
-  -d '{
-    "userId": 1,
-    "topK": 5,
-    "algorithm": "RL (Bandit)"
-  }'
-
-# Get user intelligence
-curl http://127.0.0.1:8000/api/user-intelligence/1
-```
-
----
-
-## 🛠️ **Troubleshooting**
-
-### **Frontend won't start**
-```bash
-# Clear node_modules cache
+cd frontend
 rm -rf node_modules package-lock.json
 npm install
 npm run dev
 ```
 
-### **Backend won't start**
+### Backend will not start
+
 ```bash
-# Check Python version (need 3.9+)
+cd backend
 python --version
+# Should be 3.9+
 
-# Verify virtual environment activation
-# Windows: venv\Scripts\activate should show (venv) in terminal
-# macOS/Linux: source venv/bin/activate
-
-# Reinstall dependencies
+# Activate venv first, then reinstall
 pip install --upgrade -r requirements.txt
 ```
 
-### **CORS errors**
+### CORS or connection errors
+
 - Ensure backend is running on `127.0.0.1:8000`
-- Check `.env` file has correct frontend URL in CORS_ORIGINS
-- Restart backend after changing `.env`
+- Ensure frontend is running on `localhost:5173`
+- Restart backend after changing backend environment variables
 
-### **Models not loading**
-- Verify all model files exist in their directories:
-  - `Feature Engineering + Baseline Model/rf_model.pkl`
-  - `GraphModel/movie_embeddings.txt`
-  - `Sequential Deep Learning Model/models/lstm_model.pt`
-  - `Reinforcement_Learning_Recommender/models/mab_agent_thompson.pkl`
+### Model file missing errors
+
+Verify these files exist:
+
+- `Feature Engineering + Baseline Model/rf_model.pkl`
+- `GraphModel/movie_embeddings.txt`
+- `SequentialDeepLearningModel/models/lstm_model.pt`
+- `Reinforcement_Learning_Recommender/models/mab_agent_thompson.pkl`
 
 ---
 
-## 📚 **Technical Stack**
+## Technical Stack
 
-### **Frontend**
+### Frontend
+
 - React 19 + React Router
-- Vite (build tool)
-- Tailwind CSS + custom dark theme
-- Chart.js (metrics visualizations)
-- No UI framework — pure custom components
+- Vite
+- Tailwind CSS
+- Chart.js / react-chartjs-2
 
-### **Backend**
-- FastAPI (async REST API)
-- Uvicorn (ASGI server)
-- Pydantic (data validation)
-- NumPy, Pandas (data processing)
-- Scikit-learn (RF baseline)
-- PyTorch (LSTM model)
-- Joblib (model serialization)
+### Backend
 
-### **ML Models**
-- **Graph**: Node2Vec embeddings (64-dim)
-- **Baseline**: Random Forest classifier (scikit-learn)
-- **Sequential**: Attention LSTM (PyTorch, 128 hidden units)
-- **RL**: Thompson Sampling multi-armed bandit
+- FastAPI + Uvicorn
+- Pydantic / pydantic-settings
+- NumPy, Pandas
+- Scikit-learn (RF)
+- PyTorch (LSTM)
+- Joblib
 
-### **Data**
-- MovieLens "ml-latest-small" (9,724 movies, 100K ratings)
-- Per-model data splits for evaluation rigor
+### Data
+
+- MovieLens ml-latest-small
 
 ---
 
-## 👥 **Team**
+## Team
 
-Developed by: **Harsh Kumar, Vikesh Mehta, Ishan, Ayush, Om Kabade**
+| Name | Register No | Module |
+|------|-------------|--------|
+| Vikesh Mehta | 22BCE11631 | M5 - Backend Integration and React Dashboard |
+| Ayush Raj | 22BCE10636 | M1 - Graph Representation Learning (Node2Vec) |
+| Om Milind Kabade | 22BCE10890 | M2 - Feature Engineering and Random Forest Baseline |
+| Harsh Kumar | 22BCE11405 | M4 - Reinforcement Learning Agent (Thompson Sampling) |
+| Ishan Peshkar | 22BCE10502 | M3 - Sequential Deep Learning (Attention-LSTM) |
 
-**VIT Bhopal · 2024**
-
----
-
-## 📖 **Documentation**
-
-- **Frontend Code**: See inline JSDoc comments in React components
-- **Backend Code**: See docstrings in `app.py` endpoints
-- **Models**: Individual README files in each model folder
-- **API Spec**: Full OpenAPI/Swagger docs at `http://127.0.0.1:8000/docs`
-
----
-
-## 🚀 **Next Steps**
-
-- [ ] Deploy frontend to Vercel/Netlify
-- [ ] Deploy backend to AWS/Azure
-- [ ] Add user authentication (OAuth2)
-- [ ] Implement engagement database persistence
-- [ ] Add A/B testing framework
-- [ ] Create admin dashboard for model monitoring
-- [ ] Expand to real-time model retraining
-- [ ] Integrate live user feedback loop
+Supervisor: Mr. Chour Singh Rajpoot  
+Institution: VIT Bhopal University, Department of Computer Science and Engineering  
+Course: DSN4095 - Capstone Project Phase II  
+Year: 2026
 
 ---
 
-## 📄 **License**
+## Dataset
 
-Academic Research Project — VIT Bhopal (2024)
+This project uses the [MovieLens ml-latest-small](https://grouplens.org/datasets/movielens/latest/) dataset.
 
----
+Citation:  
+F. Maxwell Harper and Joseph A. Konstan. 2015. *The MovieLens Datasets: History and Context*. ACM Transactions on Interactive Intelligent Systems, 5(4):19.
 
-## 💬 **Support**
-
-For issues or questions:
-1. Check the **Troubleshooting** section above
-2. Review API docs at `http://127.0.0.1:8000/docs` (when backend is running)
-3. Check browser console (F12) for frontend errors
-4. Check terminal logs for backend errors
+If needed, download from [grouplens.org](https://grouplens.org/datasets/movielens/latest/) and place files in model-specific data folders.
 
 ---
 
-**Ready to explore AI-powered recommendations?**
+## References
 
-```bash
-npm run dev    # Start frontend
-uvicorn app:app --reload  # Start backend (in another terminal)
-```
+1. Koren, Y., Bell, R., Volinsky, C. - Matrix Factorization Techniques for Recommender Systems - IEEE Computer, 2009
+2. Hidasi, B. et al. - Session-based Recommendations with Recurrent Neural Networks - ICLR, 2016
+3. Grover, A., Leskovec, J. - node2vec: Scalable Feature Learning for Networks - KDD, 2016
+4. Chapelle, O., Li, L. - An Empirical Evaluation of Thompson Sampling - NeurIPS, 2011
+5. Hochreiter, S., Schmidhuber, J. - Long Short-Term Memory - Neural Computation, 1997
 
-Open http://localhost:5173 and click "Open Dashboard" 🎬
+---
+
+## License
+
+Academic Research Project - VIT Bhopal (Capstone).
+
+---
+
+<p align="center">
+  Built at VIT Bhopal University · Capstone Project Phase II · March 2026
+</p>

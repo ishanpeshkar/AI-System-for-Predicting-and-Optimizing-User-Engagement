@@ -28,7 +28,9 @@ BaselineModelPath = BaselineDir / "rf_model.pkl"
 GraphDir = RepoRoot / "GraphModel"
 GraphEmbeddingsPath = GraphDir / "movie_embeddings.txt"
 
-SequentialDir = RepoRoot / "Sequential Deep Learning Model"
+SequentialDir = RepoRoot / "SequentialDeepLearningModel"
+if not SequentialDir.exists():
+    SequentialDir = RepoRoot / "Sequential Deep Learning Model"
 SequentialDataDir = SequentialDir / "data"
 SequentialModelWeights = SequentialDir / "models" / "lstm_model.pt"
 
