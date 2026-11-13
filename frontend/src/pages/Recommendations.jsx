@@ -98,7 +98,7 @@ export default function Recommendations() {
               type="number"
               min={1}
               value={userId}
-              onChange={(e) => setUserId(Number(e.target.value))}
+              onChange={(e) => setUserId(e.target.value === '' ? '' : Number(e.target.value))}
             />
           </label>
 
@@ -125,7 +125,7 @@ export default function Recommendations() {
               min={1}
               max={50}
               value={topK}
-              onChange={(e) => setTopK(Number(e.target.value))}
+              onChange={(e) => setTopK(e.target.value === '' ? '' : Number(e.target.value))}
             />
           </label>
 

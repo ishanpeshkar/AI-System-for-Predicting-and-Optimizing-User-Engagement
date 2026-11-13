@@ -104,7 +104,7 @@ export default function AppLayout() {
           </nav>
         </div>
 
-        <p className="cp-sidebar-footnote">VIT Bhopal · 2024</p>
+        <p className="cp-sidebar-footnote">VIT Bhopal · Capstone 2026</p>
       </aside>
 
       <div className="cp-main">

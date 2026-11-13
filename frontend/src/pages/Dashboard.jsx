@@ -177,8 +177,10 @@ export default function Dashboard() {
     }
   }
 
-  async function loadUserRecommendations() {
-    const parsedUserId = Number(userId)
+  // `overrideUserId` lets callers (e.g. "Run Demo") load a specific user without
+  // waiting for the userId state update, which would otherwise read a stale value.
+  async function loadUserRecommendations(overrideUserId) {
+    const parsedUserId = Number(overrideUserId ?? userId)
     const normalizedUserId = Number.isFinite(parsedUserId) && parsedUserId >= 1 ? parsedUserId : 1
     const fallbackMode = !Number.isFinite(parsedUserId) || parsedUserId < 1
 
@@ -238,10 +240,7 @@ export default function Dashboard() {
 
   function handleRunDemo() {
     setUserId(1)
-    // Use useEffect to load after state update
-    setTimeout(() => {
-      loadUserRecommendations()
-    }, 0)
+    loadUserRecommendations(1)
   }
 
   const rlTop = results.rl[0]
@@ -281,7 +280,7 @@ export default function Dashboard() {
                 setUserId(next === '' ? '' : Number(next))
               }}
             />
-            <button className="cp-button-primary" onClick={loadUserRecommendations}>
+            <button className="cp-button-primary" onClick={() => loadUserRecommendations()}>
               {loading ? 'Loading...' : 'Load user'}
             </button>
             <button
